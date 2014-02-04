@@ -32,12 +32,31 @@ class Controller:
         self.util = Util(opts)
 
     def provision(self):
+        if self.opts['<package>']:
+            packages = self.opts['<package>']
+        else:
+            packages = self.util.get_enabled()
+
+        for package in packages:
+            self._provision_package(package)
+
+    def _provision_package(self, package):
         shell = os.path.dirname(__file__) + '/shell.sh'
         if os.path.exists(shell):
-            vendor, package = self.util.resolve_name(self.opts['<package>'][0])
-            path = "%s/.vyro/repos/%s/%s/package.sh" % (os.getcwd(), vendor, package)
+            # TODO: Fix resolve_name to also resolve and return the path to the package
+            vendor, package = self.util.resolve_name(package)
+            path = "%s/.vyro/repos/%s/%s" % (os.getcwd(), vendor, package)
+            print path
             if os.path.exists(path):
-                subprocess.call(['bash', shell, 'provision', path])
+                subprocess.call([
+                    'bash',                         # bash
+                    shell,                          # command
+                    'provision',                    # action
+                    os.path.dirname(__file__),      # lib directory
+                    os.getcwd(),                    # project directory
+                    "%s:%s" % (vendor, package),    # vendor:package name
+                    path                            # path to package
+                ])
 
     def available(self):
         """
@@ -103,7 +122,7 @@ class Controller:
         
         config = self.util.get_config(vendor, package)
         for key, value in config.iteritems():
-            print "%s = %s" % (key, value)
+            print "%s='%s'" % (key.upper(), value)
 
     def readme(self):
         """
