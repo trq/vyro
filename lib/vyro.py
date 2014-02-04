@@ -1,5 +1,6 @@
 import pickle
 import os
+import subprocess
 
 class Router:
 
@@ -16,8 +17,7 @@ class Router:
             'disable',
             'configure',
             'readme',
-            'fetch',
-            'test'
+            'fetch'
         ]
 
         for method in methods:
@@ -32,8 +32,12 @@ class Controller:
         self.util = Util(opts)
 
     def provision(self):
-        print "This is provision"
-        print self.opts
+        shell = os.path.dirname(__file__) + '/shell.sh'
+        if os.path.exists(shell):
+            vendor, package = self.util.resolve_name(self.opts['<package>'][0])
+            path = "%s/.vyro/repos/%s/%s/package.sh" % (os.getcwd(), vendor, package)
+            if os.path.exists(path):
+                subprocess.call(['bash', shell, 'provision', path])
 
     def available(self):
         """
@@ -113,8 +117,16 @@ class Controller:
             readme.close()
 
     def fetch(self):
-        print "This is fetch"
-        print self.opts
+        vendor = self.opts['<vendor>']
+        path = "%s/.vyro/repos/%s" % (os.getcwd(), vendor)
+        url = "https://github.com/%s/vyro-packages.git" % vendor
+        if not os.path.exists(path):
+            try:
+                subprocess.check_output(['gitalong', 'clone', url, path], stderr=subprocess.STDOUT, shell=True);
+            except subprocess.CalledProcessError as e:
+                print "Unable to fetch " + url
+        else:
+            print "This vendor already exists"
 
 class Util:
 

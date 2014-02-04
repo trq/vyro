@@ -9,7 +9,7 @@ Usage:
   vyro [-v] disable [<package>]...
   vyro [-v] configure (<package>) [<key>] [<value>]
   vyro [-v] readme (<package>)
-  vyro [-v] fetch (<repo>)
+  vyro [-v] fetch (<vendor>)
   vyro (-h | --help)
   vyro (-v | --verbose)
   vyro --version
