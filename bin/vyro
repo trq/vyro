@@ -24,8 +24,8 @@ Options:
 import os
 import sys
 
-if os.path.exists(os.path.dirname(__file__) + '/../lib'):
-    sys.path.append(os.path.dirname(__file__) + '/../lib')
+if os.path.exists(os.path.dirname(__file__) + '/../lib/python'):
+    sys.path.append(os.path.dirname(__file__) + '/../lib/python')
 
 from docopt import docopt
 import vyro

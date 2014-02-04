@@ -7,9 +7,9 @@ VYRO_ACTION="$1" ; shift
 VYRO_LIB_DIR="$1" ; shift
 VYRO_PROJECT_DIR="$1" ; shift
 
-VYRO_BASE_PKG="$VYRO_LIB_DIR/package.sh"
-VYRO_PKG_LIBS="$VYRO_LIB_DIR/libs.sh"
-VYRO_ENV="$VYRO_LIB_DIR/env.sh"
+VYRO_BASE_PKG="$VYRO_LIB_DIR/bash/package.sh"
+VYRO_PKG_LIBS="$VYRO_LIB_DIR/bash/libs.sh"
+VYRO_ENV="$VYRO_LIB_DIR/bash/env.sh"
 
 VYRO_PROJECT_ENV="$VYRO_PROJECT_DIR/.vyro/env.sh"
 VYRO_PROJECT_HOOKS_DIR="$VYRO_PROJECT_DIR/.vyro/hooks"
