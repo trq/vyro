@@ -10,6 +10,7 @@ Usage:
   vyro [-v] configure (<package>) [<key>] [<value>]
   vyro [-v] readme (<package>)
   vyro [-v] fetch (<vendor>)
+  vyro [-v] test (<package>)
   vyro (-h | --help)
   vyro (-v | --verbose)
   vyro --version

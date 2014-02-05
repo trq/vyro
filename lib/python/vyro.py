@@ -17,7 +17,8 @@ class Router:
             'disable',
             'configure',
             'readme',
-            'fetch'
+            'fetch',
+            'test'
         ]
 
         for method in methods:
@@ -32,21 +33,28 @@ class Controller:
         self.util = Util(opts)
 
     def provision(self):
+        """
+        Provision either  alist of packages if one is
+        supplied, or all currently enabled packages.
+        """
         if self.opts['<package>']:
             packages = self.opts['<package>']
         else:
             packages = self.util.get_enabled()
 
         for package in packages:
-            self._provision_package(package)
+            self.__provision_package(package)
 
-    def _provision_package(self, package):
-        shell = os.path.dirname(__file__) + '/shell.sh'
+    def __provision_package(self, package):
+        """
+        Setup an enviroment where a package can have its provisioning
+        scripts executed then execute them.
+
+        See ./lib/bash/shell.sh
+        """
+        shell = os.path.dirname(__file__) + '/../bash/shell.sh'
         if os.path.exists(shell):
-            # TODO: Fix resolve_name to also resolve and return the path to the package
-            vendor, package = self.util.resolve_name(package)
-            path = "%s/.vyro/repos/%s/%s" % (os.getcwd(), vendor, package)
-            print path
+            vendor, package, path = self.util.resolve_package(package)
             if os.path.exists(path):
                 subprocess.call([
                     'bash',                         # bash
@@ -86,9 +94,9 @@ class Controller:
         os.chdir(os.getcwd() + '/.vyro/enabled')
 
         for package in self.opts['<package>']:
-            package = self.util.resolve_name(package)[1]
+            vendor, package = self.util.resolve_package(package)[:2]
             if not os.path.islink(package):
-                os.symlink('/vagrant/.vyro/enabled/' + package, package)
+                os.symlink("/vagrant/.vyro/repo/%s/%s" % (vendor, package), package)
 
     def disable(self):
         """
@@ -106,7 +114,7 @@ class Controller:
 
         Dump the new configuration to screen.
         """
-        vendor, package = self.util.resolve_name(self.opts['<package>'][0])
+        vendor, package = self.util.resolve_package(self.opts['<package>'][0])[:2]
         if self.opts['<key>'] and self.opts['<value>']:
             key, value = self.opts['<key>'], self.opts['<value>']
             config = self.util.get_config(vendor, package)
@@ -128,40 +136,77 @@ class Controller:
         """
         Display the contents of the README.md file belonging to a particular package.
         """
-        vendor, package = self.util.resolve_name(self.opts['<package>'][0])
-        path = "%s/.vyro/repos/%s/%s/README.md" % (os.getcwd(), vendor, package)
+        vendor, package, path = self.util.resolve_package(self.opts['<package>'][0])
+        path += "/README.md"
         if os.path.exists(path):
             readme = open(path, 'r')
             print readme.read()
             readme.close()
 
     def fetch(self):
+        """
+        Clone a package repo from github
+        """
         vendor = self.opts['<vendor>']
         path = "%s/.vyro/repos/%s" % (os.getcwd(), vendor)
         url = "https://github.com/%s/vyro-packages.git" % vendor
         if not os.path.exists(path):
             try:
-                subprocess.check_output(['gitalong', 'clone', url, path], stderr=subprocess.STDOUT, shell=True);
+                subprocess.check_output(['git', 'clone', url, path], stderr=subprocess.STDOUT, shell=True);
             except subprocess.CalledProcessError as e:
                 print "Unable to fetch " + url
         else:
             print "This vendor already exists"
+
+    def test(self):
+        print self.util.resolve_package(self.opts['<package>'][0]);
 
 class Util:
 
     def __init__(self, opts):
         self.opts = opts
 
-    def resolve_name(self, package):
+    def resolve_package(self, package):
         """
-        Resolves a vendor:package name combination taking into
-        account any default vendor when none is supplied
-        """
-        package = package.split(':')
-        if len(package) < 2:
-            package[:0] = ['default']
+        Resolves a package into a [vendor, package, path] list.
 
-        return package
+        Resolution can be done by passing either of the following strings;
+            "package"
+            "vendor:package"
+            "/path/to/vendor/package"
+
+        If a package name alone is passed, we first check to see if this
+        package is enabled, if so, we resolve that particular package. Otherwise,
+        we will resolve a package from within the default vendor repository (if it exists).
+
+        TODO: A resolved package should likely by an object type.
+        """
+        if os.path.isdir(package):
+            path     = package
+            parts    = package.split('/')
+            package  = parts.pop()
+            vendor   = parts.pop()
+            resolved = [vendor, package]
+        else:
+            resolved = package.split(':')
+            if len(resolved) < 2:
+                path = "%s/.vyro/enabled/%s" % (os.getcwd(), resolved[0])
+                if os.path.islink(path):
+                    path     = os.readlink(path)
+                    parts    = path.split('/')
+                    package  = parts.pop()
+                    vendor   = parts.pop()
+                    resolved = [vendor, package]
+                else:
+                    path = "%s/.vyro/repo/default/%s" % (os.getcwd(), resolved[0])
+                    if os.path.isdir(path):
+                        resolved[:0] = ['default']
+
+        vendor, package = resolved
+        path = "%s/.vyro/repos/%s/%s" % (os.getcwd(), vendor, package)
+        resolved.append(path)
+
+        return resolved
 
     def requires(self, path):
         """
@@ -172,6 +217,9 @@ class Util:
             os.makedirs(path)
 
     def get_config(self, vendor, package, config = {}):
+        """
+        Retrieve a config option from a package
+        """
         path = "%s/.vyro/repos/%s/%s" % (os.getcwd(), vendor, package)
         if os.path.exists(path):
             path += '/.config'
@@ -183,6 +231,9 @@ class Util:
         return config
 
     def put_config(self, vendor, package, config):
+        """
+        Save a config option against a package
+        """
         path = "%s/.vyro/repos/%s/%s" % (os.getcwd(), vendor, package)
         if os.path.exists(path):
             path += '/.config'
