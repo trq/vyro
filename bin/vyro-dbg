@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+~/src/pydbgp/pydbgp ~/src/vyro/bin/vyro "$@"
+exit 0
