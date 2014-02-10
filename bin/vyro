@@ -3,14 +3,13 @@
 
 Usage:
   vyro [-v] provision [<package>]...
-  vyro [-v] available
-  vyro [-v] enabled
-  vyro [-v] enable [<package>]...
-  vyro [-v] disable [<package>]...
+  vyro [-v] list
+  vyro [-v] staged
+  vyro [-v] stage [<package>]...
+  vyro [-v] unstage [<package>]...
   vyro [-v] configure (<package>) [<key>] [<value>]
   vyro [-v] readme (<package>)
   vyro [-v] fetch (<vendor>)
-  vyro [-v] test (<package>)
   vyro (-h | --help)
   vyro (-v | --verbose)
   vyro --version
