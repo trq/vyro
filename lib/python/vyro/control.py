@@ -28,14 +28,16 @@ class Controller:
         """
         Stage / unstage a list of packages
         """
-        root = RootRepository(env.paths.root)
         stage = StageRepository(env.paths.stage)
         for package_name in self.opts['<package>']:
-            package = root.resolve_package(package_name)
-            if package:
-                if enable:
+            if enable:
+                root = RootRepository(env.paths.root)
+                package = root.resolve_package(package_name)
+                if package:
                     stage.stage(package)
-                else:
+            else:
+                package = stage.get_package(package_name)
+                if package:
                     stage.unstage(package)
 
     def provision(self):
@@ -64,7 +66,7 @@ class Controller:
         """
         stage = StageRepository(env.paths.stage)
         for package in stage.get_packages():
-            print "%s:%s" % (package.vendor, package.name),
+            print package.name + ' -> ' + package.vendor + ':' + package.name 
 
     def stage(self):
         """

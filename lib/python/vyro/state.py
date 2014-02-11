@@ -16,6 +16,7 @@ class _AttrDict(dict):
         self[key] = value
 
 env = _AttrDict({
+    'default_repo': 'trq',
     'paths': _AttrDict({
         'root': '.vyro',
         'hooks': '.vyro/hooks',

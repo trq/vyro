@@ -33,11 +33,11 @@ class RootRepository:
 
     def resolve_package(self, package):
         """
-        Retrieve a package by vendor:package name
+        Attempt to retrieve a package by vendor:package name
         """
         name = package.split(':')
         if len(name) < 2:
-            name[:0] = ['default']
+            name[:0] = [env.default_repo]
 
         vendor_name, package_name = name
 
@@ -93,6 +93,14 @@ class StageRepository():
                 self.packages.append(package)
 
         return self.packages
+
+    def get_package(self, package_name):
+        """
+        Retrieve a package by package name
+        """
+        if os.path.islink(self.path + '/' + package_name):
+            package_path = os.readlink(self.path + '/' + package_name)
+            return Package(package_path)
 
     def stage(self, package):
         """
