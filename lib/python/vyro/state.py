@@ -20,6 +20,7 @@ env = _AttrDict({
     'paths': _AttrDict({
         'root': '.vyro',
         'hooks': '.vyro/hooks',
+        'cache': '.vyro/cache',
         'stage': '.vyro/stage'
     }),
     'names': _AttrDict({
