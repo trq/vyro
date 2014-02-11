@@ -3,14 +3,13 @@
 
 Usage:
   vyro [-v] provision [<package>]...
-  vyro [-v] available
-  vyro [-v] enabled
-  vyro [-v] enable [<package>]...
-  vyro [-v] disable [<package>]...
+  vyro [-v] list
+  vyro [-v] staged
+  vyro [-v] stage [<package>]...
+  vyro [-v] unstage [<package>]...
   vyro [-v] configure (<package>) [<key>] [<value>]
   vyro [-v] readme (<package>)
   vyro [-v] fetch (<vendor>)
-  vyro [-v] test (<package>)
   vyro (-h | --help)
   vyro (-v | --verbose)
   vyro --version
@@ -29,14 +28,14 @@ if os.path.exists(os.path.dirname(__file__) + '/../lib/python'):
     sys.path.append(os.path.dirname(__file__) + '/../lib/python')
 
 from docopt import docopt
-import vyro
+from vyro.control import Router
 
 if __name__ == '__main__':
     opts = docopt(__doc__, version='Vyro 0.0.0')
 
     if os.path.isfile(os.getcwd() + '/Vagrantfile'):
-        router = vyro.Router(opts)
+        router = Router(opts)
         router.handle()
 
     else:
-        print "No Vagrantfile found"
+        print "No Vagrantfile Found"
