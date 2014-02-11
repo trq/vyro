@@ -3,8 +3,10 @@ import subprocess
 from vyro.package import Package
 from vyro.state import env
 
-class RootRepository():
-
+class RootRepository:
+    """
+    The "root" repository, used to manage multiple "vendor" respositories
+    """
     def __init__(self, path):
         self.path = path
         self.vendors = [];
@@ -43,8 +45,10 @@ class RootRepository():
         if vendor:
             return vendor.get_package(package_name)
 
-class VendorRepository():
-
+class VendorRepository:
+    """
+    The "vendor" repository, used to manage multiple "packages".
+    """
     def __init__(self, path):
         self.path = path
         self.name, = path.split('/')[-1:]
@@ -70,7 +74,10 @@ class VendorRepository():
                 return package
 
 class StageRepository():
-
+    """
+    The "stage" repository, used to manage symlinks pointing
+    to all the packages that are staged for provisioning.
+    """
     def __init__(self, path):
         self.path = path
         self.packages = [];
@@ -88,17 +95,26 @@ class StageRepository():
         return self.packages
 
     def stage(self, package):
+        """
+        Stage a package for provisioning
+        """
         os.chdir(self.path)
         if not os.path.exists(package.name):
             os.symlink(package.path, package.name)
 
     def unstage(self, package):
+        """
+        Un stage a package
+        """
         os.chdir(self.path)
         if os.path.islink(package.name):
             os.remove(package.name)
 
 class RemoteRepository():
-
+    """
+    The "remote" repository. A WIP.
+    Currently used only to clone a remote repository from Github.
+    """
     def __init__(self, name):
         self.name = name
 

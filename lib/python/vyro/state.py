@@ -2,7 +2,8 @@ class _AttrDict(dict):
     """
     Dictionary subclass enabling attribute lookup/assignment of keys/values.
 
-    Blatantly stolen from fabric/utils.py. I will import this properly when I figfure out how.
+    Blatantly stolen from fabric.
+    https://github.com/fabric/fabric/blob/master/fabric/utils.py#L157 
     """
     def __getattr__(self, key):
         try:
