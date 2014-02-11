@@ -1,5 +1,7 @@
 import os
 import subprocess
+import md5
+from vyro.state import env
 
 class Package:
 
@@ -8,6 +10,30 @@ class Package:
         # The last two fragments of a packages
         # path are the vendor and package name
         self.vendor, self.name = path.split('/')[-2:]
+
+    def __hash(self):
+        package_path = self.path + '/package.sh'
+        if os.path.exists(package_path):
+            with open(self.path + '/package.sh', 'r') as fp:
+                contents = fp.read()
+            fp.closed
+
+            return md5.new(contents).hexdigest()
+
+    def __cache(self):
+        with open(env.paths.cache + '/' + self.name + '.hash', 'w') as fp:
+            fp.write(self.__hash())
+        fp.closed
+
+    def __is_cached(self):
+        if not os.path.exists(env.paths.cache + '/' + self.name + '.hash'):
+            return False
+
+        with open(env.paths.cache + '/' + self.name + '.hash', 'r') as fp:
+            contents = fp.read()
+        fp.closed
+
+        return contents == self.__hash()
 
     def has_readme(self):
         """
@@ -21,9 +47,9 @@ class Package:
         Return the contents of the package README.md as a string.
         """
         if self.has_readme():
-            fp = open(self.path + '/README.md', 'r')
-            readme = fp.read()
-            fp.close()
+            with open(self.path + '/README.md', 'r') as fp:
+                readme = fp.read()
+            fp.closed
             return readme
 
     def provision(self):
@@ -33,14 +59,16 @@ class Package:
 
         See ./lib/bash/shell.sh
         """
-        lib_dir = "%s/../../" % os.path.dirname(__file__)  # lib directory
-        shell = lib_dir + '/bash/shell.sh'
-        subprocess.call([
-            'bash',                             # bash
-            shell,                              # command
-            'provision',                        # action
-            lib_dir,                            # lib directory
-            os.getcwd(),                        # project directory
-            "%s:%s" % (self.vendor, self.name), # vendor:package name
-            self.path                           # path to package
-        ])
+        if not self.__is_cached():
+            lib_dir = "%s/../../" % os.path.dirname(__file__)  # lib directory
+            shell = lib_dir + '/bash/shell.sh'
+            subprocess.call([
+                'bash',                             # bash
+                shell,                              # command
+                'provision',                        # action
+                lib_dir,                            # lib directory
+                os.getcwd(),                        # project directory
+                "%s:%s" % (self.vendor, self.name), # vendor:package name
+                self.path                           # path to package
+            ])
+            self.__cache()
