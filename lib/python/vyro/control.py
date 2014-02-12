@@ -80,7 +80,17 @@ class Controller:
         """
         self.__toggle_stage(enable=False)
 
-    def configure(self): pass
+    def configure(self):
+        root = RootRepository(env.paths.root)
+        package = root.resolve_package(self.opts['<package>'][0])
+        if self.opts['<key>'] and self.opts['<value>']:
+            print "edit a config option"
+        elif self.opts['<key>']:
+            print "delete a config option"
+        else:
+            for option in package.config['config']:
+                value = option['value'] if 'value' in option.keys() else option['default']
+                print option['name'] + '="' + value + '"'
 
     def readme(self):
         root = RootRepository(env.paths.root)

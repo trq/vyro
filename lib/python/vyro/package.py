@@ -1,6 +1,7 @@
 import os
 import subprocess
 import md5
+import json
 from vyro.state import env
 
 class Package:
@@ -10,6 +11,11 @@ class Package:
         # The last two fragments of a packages
         # path are the vendor and package name
         self.vendor, self.name = path.split('/')[-2:]
+
+        if os.path.exists(self.path + '/config.json'):
+            with open(self.path + '/config.json', 'r') as fp:
+                self.config = json.load(fp)
+            fp.closed
 
     def __hash(self):
         package_path = self.path + '/package.sh'
