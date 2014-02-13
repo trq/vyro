@@ -130,8 +130,8 @@ class RemoteRepository():
         """
         Clone a package repo from github
         """
-        path = "%s/%s/%s" % (env.paths.root, env.names.repo_dir, self.name)
-        url = "https://github.com/%s/vyro-packages.git" % self.name
+        path = "{root}/{repo}/{name}".format(root=env.paths.root, repo=env.names.repo_dir, name=self.name)
+        url = "https://github.com/{vendor}/vyro-packages.git".format(vendor=self.name)
         if not os.path.exists(path):
             try:
                 subprocess.check_output(['git', 'clone', url, path], stderr=subprocess.STDOUT, shell=True);
