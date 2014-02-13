@@ -17,6 +17,9 @@ class Package:
                 self.config = json.load(fp)
             fp.closed
 
+    def __eq__(self, other):
+        return self.name == other.name
+
     def __hash(self):
         package_path = self.path + '/package.sh'
         if os.path.exists(package_path):

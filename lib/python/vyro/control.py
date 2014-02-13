@@ -55,10 +55,12 @@ class Controller:
         List available packages by vendor
         """
         root = RootRepository(env.paths.root)
+        stage = StageRepository(env.paths.stage)
         for vendor in root.get_vendors():
             print vendor.name + ":"
             for package in vendor.get_packages():
-                print package.name,
+                if package not in stage.get_packages():
+                    print package.name,
 
     def staged(self):
         """
