@@ -89,7 +89,7 @@ class Controller:
             print "delete a config option"
         else:
             for option in package.config['config']:
-                value = option['value'] if 'value' in option.keys() else option['default']
+                value = option['value'] if 'value' in option else option['default']
                 print option['name'] + '="' + value + '"'
 
     def readme(self):

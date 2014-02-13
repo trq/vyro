@@ -66,15 +66,15 @@ class Package:
         See ./lib/bash/shell.sh
         """
         if not self.__is_cached():
-            lib_dir = "%s/../../" % os.path.dirname(__file__)  # lib directory
+            lib_dir = "{path}/../../".format(path=os.path.dirname(__file__))  # lib directory
             shell = lib_dir + '/bash/shell.sh'
             subprocess.call([
-                'bash',                             # bash
-                shell,                              # command
-                'provision',                        # action
-                lib_dir,                            # lib directory
-                os.getcwd(),                        # project directory
-                "%s:%s" % (self.vendor, self.name), # vendor:package name
-                self.path                           # path to package
+                'bash',                                                         # bash
+                shell,                                                          # command
+                'provision',                                                    # action
+                lib_dir,                                                        # lib directory
+                os.getcwd(),                                                    # project directory
+                "{vendor}:{name}".format(vendor=self.vendor, name=self.name),   # vendor:package name
+                self.path                                                       # path to package
             ])
             self.__cache()
