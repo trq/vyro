@@ -1,29 +1,14 @@
-class _AttrDict(dict):
-    """
-    Dictionary subclass enabling attribute lookup/assignment of keys/values.
+from vyro.util import AttrDict
 
-    Blatantly stolen from fabric.
-    https://github.com/fabric/fabric/blob/master/fabric/utils.py#L157 
-    """
-    def __getattr__(self, key):
-        try:
-            return self[key]
-        except KeyError:
-            # to conform with __getattr__ spec
-            raise AttributeError(key)
-
-    def __setattr__(self, key, value):
-        self[key] = value
-
-env = _AttrDict({
+env = AttrDict({
     'default_repo': 'trq',
-    'paths': _AttrDict({
+    'paths': AttrDict({
         'root': '.vyro',
         'hooks': '.vyro/hooks',
         'cache': '.vyro/cache',
         'stage': '.vyro/stage'
     }),
-    'names': _AttrDict({
+    'names': AttrDict({
         'repo_dir': 'repos'
     })
 })

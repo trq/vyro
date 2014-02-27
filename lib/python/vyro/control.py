@@ -1,4 +1,5 @@
 from vyro.repository import RootRepository, StageRepository, RemoteRepository
+from vyro.prompter import Prompter
 from vyro.state import env
 
 class Router:
@@ -68,7 +69,7 @@ class Controller:
         """
         stage = StageRepository(env.paths.stage)
         for package in stage.get_packages():
-            print package.name + ' -> ' + package.vendor + ':' + package.name 
+            print package.name + ' -> ' + package.vendor + ':' + package.name
 
     def stage(self):
         """
@@ -85,20 +86,20 @@ class Controller:
     def configure(self):
         root = RootRepository(env.paths.root)
         package = root.resolve_package(self.opts['<package>'][0])
-        if self.opts['<key>'] and self.opts['<value>']:
-            print "edit a config option"
-        elif self.opts['<key>']:
-            print "delete a config option"
+        if self.opts['<key>']:
+            package.set_config_option(self.opts['<key>'], self.opts['<value>'])
+        elif self.opts['--list']:
+            package.list_config()
+        elif self.opts['--dump']:
+            package.dump_config()
         else:
-            for option in package.config['config']:
-                value = option['value'] if 'value' in option else option['default']
-                print option['name'] + '="' + value + '"'
+            prompter = Prompter(package)
+            prompter.prompt()
 
     def readme(self):
         root = RootRepository(env.paths.root)
         package = root.resolve_package(self.opts['<package>'][0])
-        if package and package.has_readme():
-            print package.readme()
+        print package.readme
 
     def fetch(self):
         vendor = RemoteRepository(self.opts['<vendor>'])
