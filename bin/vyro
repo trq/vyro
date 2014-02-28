@@ -2,6 +2,7 @@
 """Vyro
 
 Usage:
+  vyro [-v] init
   vyro [-v] provision [<package>]...
   vyro [-v] list
   vyro [-v] staged
@@ -35,9 +36,6 @@ from vyro.control import Router
 if __name__ == '__main__':
     opts = docopt(__doc__, version='Vyro 0.0.0')
 
-    if os.path.isfile(os.getcwd() + '/Vagrantfile'):
-        router = Router(opts)
-        router.handle()
+    router = Router(opts)
+    router.handle()
 
-    else:
-        print "No Vagrantfile Found"

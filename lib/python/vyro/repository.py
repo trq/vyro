@@ -11,6 +11,14 @@ class RootRepository:
         self.path = path
         self.vendors = [];
 
+    def init(self):
+        if not os.path.exists(self.path):
+            os.mkdir(self.path)
+            os.mkdir(self.path + '/' + env.names.repo_dir)
+            for name, path in env.paths.iteritems():
+                if name != 'root':
+                    os.mkdir(path)
+
     def get_vendors(self, force=False):
         """
         Retrieve a list of all vendors within this repo
