@@ -32,7 +32,7 @@ main() {
                 source "$PKG_PATH/package.sh"
 
                 # Inject our configuration variables.
-                eval `vyro configure $PKG_NAME`
+                eval `vyro configure --dump $PKG_NAME`
 
                 # Execute the pre_provision hook
                 if [ -f "$VYRO_PROJECT_HOOKS_DIR/pre_provision.sh" ] ; then

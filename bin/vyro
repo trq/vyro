@@ -7,7 +7,7 @@ Usage:
   vyro [-v] staged
   vyro [-v] stage [<package>]...
   vyro [-v] unstage [<package>]...
-  vyro [-v] configure (<package>) [<key>] [<value>]
+  vyro [-v][--dump][--list] configure (<package>) [<key>] [<value>]
   vyro [-v] readme (<package>)
   vyro [-v] fetch (<vendor>)
   vyro (-h | --help)
@@ -17,6 +17,8 @@ Usage:
 Options:
   -h --help         Show this screen.
   -v --verbose      Show verbose output.
+  -d --dump         Dump a packages configuration as bash.
+  -l --list         List available options.
   --version         Show version.
 
 """
