@@ -6,6 +6,7 @@ env = AttrDict({
         'root': '.vyro',
         'hooks': '.vyro/hooks',
         'cache': '.vyro/cache',
+        'conf': '.vyro/conf',
         'stage': '.vyro/stage'
     }),
     'names': AttrDict({
