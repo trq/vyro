@@ -10,7 +10,7 @@ class Router:
     def handle(self):
 
         methods = [
-            'provision', 'list', 'staged', 'stage',
+            'init', 'provision', 'list', 'staged', 'stage',
             'unstage', 'configure', 'readme', 'fetch'
         ]
 
@@ -40,6 +40,10 @@ class Controller:
                 package = stage.get_package(package_name)
                 if package:
                     stage.unstage(package)
+
+    def init(self):
+        root = RootRepository(env.paths.root)
+        root.init()
 
     def provision(self):
         """
