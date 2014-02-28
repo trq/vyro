@@ -62,7 +62,11 @@ class Package:
         Get the contents of the config.json file as a dictionary
         """
         if not self.__config:
-            if os.path.exists(self.path + '/config.json'):
+            if os.path.exists(env.paths.conf + '/' + self.vendor + '.' + self.name + '.json'):
+                with open(env.paths.conf + '/' + self.vendor + '.' + self.name + '.json', 'r') as fp:
+                    self.__config = json.load(fp)
+                fp.closed
+            elif os.path.exists(self.path + '/config.json'):
                 with open(self.path + '/config.json', 'r') as fp:
                     self.__config = json.load(fp)
                 fp.closed
@@ -112,7 +116,7 @@ class Package:
                 print "This package does not support the supplied option '" + key + "'"
 
     def persist_config(self):
-        with open(self.path + '/config.json', 'w') as fp:
+        with open(env.paths.conf + '/' + self.vendor + '.' + self.name + '.json', 'w') as fp:
             json.dump(self.config, fp)
         fp.closed
 
