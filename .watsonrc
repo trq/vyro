@@ -1,0 +1,27 @@
+# watson rc
+# watson - inline issue manager
+# [goosecode] labs
+
+# Directories
+[dirs]
+./
+
+# Tags
+[tags]
+bug
+fix
+todo
+
+# Ignores
+[ignore]
+.git
+*.swp
+
+[github_api]
+trq
+
+[github_endpoint]
+https://api.github.com
+
+[github_repo]
+trq/vyro
