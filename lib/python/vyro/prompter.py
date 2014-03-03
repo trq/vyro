@@ -22,6 +22,7 @@ class Prompter:
 
             # Persist the package config
             self.package.persist_config()
+
         except KeyboardInterrupt:
             pass
 
@@ -61,7 +62,8 @@ class Prompter:
                 print "* [%d] %s" % (i, choice)
             else:
                 print "  [%d] %s" % (i, choice)
-                i += 1
+
+            i += 1
 
         answer = raw_input('? ')
         if answer:
