@@ -56,6 +56,7 @@ class Package:
 
         return contents == self.__hash()
 
+    # [todo] - All this configuration stuff should be moved into its own module.
     @property
     def config(self):
         """
@@ -105,11 +106,12 @@ class Package:
             if data.has_key('description'):
                 print '- ' + data['description']
 
+    # [todo] - While splitting #1, config options should also likely be split further.
     def set_config_option(self, key, val):
         """
         Set a configuration option
         """
-        if key and val:
+        if key:
             if self.config['config'].has_key(key):
                 self.config['config'][key]['value'] = val
             else:
