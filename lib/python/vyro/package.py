@@ -25,7 +25,7 @@ class Package:
         """
         Get the hash of the package.sh file.
 
-        TODO: Hash needs to be extended to take into account config.json as well.
+        # [todo] Hash needs to be extended to take into account config.json as well.
         """
         package_path = self.path + '/package.sh'
         if os.path.exists(package_path):
@@ -56,71 +56,11 @@ class Package:
 
         return contents == self.__hash()
 
-    # [todo] - All this configuration stuff should be moved into its own module.
-    @property
-    def config(self):
-        """
-        Get the contents of the config.json file as a dictionary
-        """
+    def get_config(self):
         if not self.__config:
-            if os.path.exists(env.paths.conf + '/' + self.vendor + '.' + self.name + '.json'):
-                with open(env.paths.conf + '/' + self.vendor + '.' + self.name + '.json', 'r') as fp:
-                    self.__config = json.load(fp)
-                fp.closed
-            elif os.path.exists(self.path + '/config.json'):
-                with open(self.path + '/config.json', 'r') as fp:
-                    self.__config = json.load(fp)
-                fp.closed
+            self.__config = Config(self.vendor, self.name, self.path)
 
         return self.__config
-
-    def dump_config(self):
-        """
-        Dump just the "config" index of the current config object
-        to the screen as valid Bash code.
-        """
-        for option, data in self.config.get('config').iteritems():
-            if data.has_key('value'):
-                value = data['value']
-                if isinstance(value, bool):
-                    if value == True:
-                        value = 1
-                    else:
-                        value = 0
-            else:
-                value = None
-
-            if value == 0:
-                print option + '=0'
-            elif value == 1:
-                print option + '=1'
-            else:
-                print option + '="' + value + '"' if value else option + '='
-
-    def list_config(self):
-        """
-        List available configuration options and there description
-        """
-        for option, data in self.config.get('config').iteritems():
-            print option,
-            if data.has_key('description'):
-                print '- ' + data['description']
-
-    # [todo] - While splitting #1, config options should also likely be split further.
-    def set_config_option(self, key, val):
-        """
-        Set a configuration option
-        """
-        if key:
-            if self.config['config'].has_key(key):
-                self.config['config'][key]['value'] = val
-            else:
-                print "This package does not support the supplied option '" + key + "'"
-
-    def persist_config(self):
-        with open(env.paths.conf + '/' + self.vendor + '.' + self.name + '.json', 'w') as fp:
-            json.dump(self.config, fp)
-        fp.closed
 
     @property
     def readme(self):
@@ -156,3 +96,72 @@ class Package:
                 self.path                                                       # path to package
             ])
             self.__cache()
+
+class Config(dict):
+
+    def __init__(self, vendor, name, path):
+        self.vendor = vendor
+        self.name = name
+        self.path = path
+        self.__config = {}
+
+        if os.path.exists(env.paths.conf + '/' + self.vendor + '.' + self.name + '.json'):
+            with open(env.paths.conf + '/' + self.vendor + '.' + self.name + '.json', 'r') as fp:
+                self.__config = json.load(fp)
+            fp.closed
+        elif os.path.exists(self.path + '/config.json'):
+            with open(self.path + '/config.json', 'r') as fp:
+                self.__config = json.load(fp)
+            fp.closed
+
+    def get(self, index):
+        return self.__config.get(index)
+
+    def dump(self):
+        """
+        Dump just the "config" index of the current config object
+        to the screen as valid Bash code.
+        """
+        for option, data in self.__config.get('config').iteritems():
+            if data.has_key('value'):
+                value = data['value']
+                if isinstance(value, bool):
+                    if value == True:
+                        value = 1
+                    else:
+                        value = 0
+            else:
+                value = None
+
+            if value == 0:
+                print option + '=0'
+            elif value == 1:
+                print option + '=1'
+            else:
+                print option + '="' + value + '"' if value else option + '='
+
+    def list(self):
+        """
+        List available configuration options and there description
+        """
+        for option, data in self.__config.get('config').iteritems():
+            print option,
+            if data.has_key('description'):
+                print '- ' + data['description']
+
+    def set(self, key, val):
+        """
+        Set a configuration option
+        """
+        if key:
+            if self.__config['config'].has_key(key):
+                self.__config['config'][key]['value'] = val
+            # [todo] - Should likely throw an exception here if key is invalid.
+
+    def persist(self):
+        """
+        Persist the config option to the local vendor.package.json file.
+        """
+        with open(env.paths.conf + '/' + self.vendor + '.' + self.name + '.json', 'w') as fp:
+            json.dump(self.__config, fp)
+        fp.closed
