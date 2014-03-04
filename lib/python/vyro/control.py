@@ -90,14 +90,16 @@ class Controller:
     def configure(self):
         root = RootRepository(env.paths.root)
         package = root.resolve_package(self.opts['<package>'][0])
+        config = package.get_config()
         if self.opts['<key>']:
-            package.set_config_option(self.opts['<key>'], self.opts['<value>'])
+            config.set(self.opts['<key>'], self.opts['<value>'])
+            config.persist()
         elif self.opts['--list']:
-            package.list_config()
+            config.list()
         elif self.opts['--dump']:
-            package.dump_config()
+            config.dump()
         else:
-            prompter = Prompter(package)
+            prompter = Prompter(config)
             prompter.prompt()
 
     def readme(self):

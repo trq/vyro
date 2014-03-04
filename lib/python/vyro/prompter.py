@@ -1,14 +1,14 @@
 class Prompter:
 
-    def __init__(self, package):
-        self.package = package
+    def __init__(self, config):
+        self.config = config
 
     def prompt(self):
         """
         Loop through all configuration options and prompt to configure.
         """
         try:
-            for option, data in self.package.config.get('config').iteritems():
+            for option, data in self.config.get('config').iteritems():
                 if data.has_key('prompt') and data['prompt'].has_key('question') and data['prompt'].has_key('type'):
                     if data['prompt']['type'].lower() == 'bool':
                         value = self.handle_bool(option, data)
@@ -18,10 +18,10 @@ class Prompter:
                             value = self.handle_choice(option, data)
 
                 # Store the config option on the package config
-                self.package.set_config_option(option, value)
+                self.config.set(option, value)
 
             # Persist the package config
-            self.package.persist_config()
+            self.config.persist()
 
         except KeyboardInterrupt:
             pass
